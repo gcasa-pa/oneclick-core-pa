@@ -49,4 +49,5 @@ EXPOSE 3000 5432
 # Start PostgreSQL, run migrations, and start Rails server
 CMD service postgresql start && \
     bundle exec rake db:migrate && \
+    bundle exec rake db:seed && \
     bundle exec rails server -b 0.0.0.0

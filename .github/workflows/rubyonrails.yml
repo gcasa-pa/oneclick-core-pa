@@ -54,11 +54,11 @@ jobs:
 
     - name: Setup database
       env:
-        RAILS_ENV: test
-        DATABASE_URL: "postgres://rails_user:password@localhost:5432/test_db"
+        RAILS_ENV: development
+        DATABASE_URL: "postgres://rails_user:password@localhost:5432/oneclick-core_development"
       run: |
         bundle exec rake db:setup
-        psql -U rails_user -d test_db -c "CREATE EXTENSION IF NOT EXISTS postgis;"
+        psql -U root -d oneclick-core_development -c "CREATE EXTENSION IF NOT EXISTS postgis;"
 
     - name: Run tests
       env:

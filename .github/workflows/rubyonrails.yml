@@ -22,11 +22,11 @@ jobs:
         ports:
           - 5432:5432
         env:
-          POSTGRES_USER: rails_user
+          POSTGRES_USER: root
           POSTGRES_PASSWORD: password
-          POSTGRES_DB: test_db
+          POSTGRES_DB: oneclick-core_development
         options: >-
-          --health-cmd "pg_isready -U rails_user -d test_db"
+          --health-cmd "pg_isready -U root -d oneclick-core_development"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5

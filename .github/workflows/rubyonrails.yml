@@ -10,61 +10,54 @@ on:
     branches: [ "master" ]
   pull_request:
     branches: [ "master" ]
+
 jobs:
   test:
     runs-on: ubuntu-latest
+
     services:
       postgres:
-        image: postgres:11-alpine
+        image: postgres:13
         ports:
-          - "5432:5432"
+          - 5432:5432
         env:
-          POSTGRES_DB: rails_test
-          POSTGRES_USER: rails
+          POSTGRES_USER: rails_user
           POSTGRES_PASSWORD: password
-    env:
-      RAILS_ENV: test
-      DATABASE_URL: "postgres://rails:password@localhost:5432/rails_test"
-    steps:
-      - name: Install ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: 2.7.6
-      - name: Install dependencies
-        run: |
-          sudo curl -sL https://deb.nodesource.com/setup_14.x | bash -
-          sudo echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list
-          sudo wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add - && sudo apt-get update -qq && sudo apt-get install -y nodejs wget gnupg2 postgresql-13 postgresql-13-postgis-3 libpq-dev
-          sudo rm -rf /var/lib/apt/lists/*
-      - name: Checkout code
-        uses: actions/checkout@v4
-      # Add or replace dependency steps here
-      - name: Install Ruby and gems
-        uses: ruby/setup-ruby@78c01b705fd9d5ad960d432d3a0cfa341d50e410 # v1.179.1
-        with:
-          bundler-cache: true
-      # Add or replace database setup steps here
-      - name: Set up database schema
-        run: bin/rails db:schema:load
-      # Add or replace test runners here
-      - name: Run tests
-        run: bin/rspec
+          POSTGRES_DB: test_db
+        options: >-
+          --health-cmd "pg_isready -U rails_user -d test_db"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
-  # lint:
-  #  runs-on: ubuntu-latest
-  #  steps:
-  #    - name: Checkout code
-  #      uses: actions/checkout@v4
-  #    - name: Install Ruby and gems
-  #      uses: ruby/setup-ruby@78c01b705fd9d5ad960d432d3a0cfa341d50e410 # v1.179.1
-  #      with:
-  #        bundler-cache: true
-  #    - name: Generate binstubs
-  #      run: bundle binstubs bundler-audit brakeman rubocop
-  #    # Add or replace any other lints here
-  #    - name: Security audit dependencies
-  #      run: bin/bundler-audit --update
-  #    - name: Security audit application code
-  #      run: bin/brakeman -q -w2
-  #    - name: Lint Ruby files
-  #      run: bin/rubocop --parallel
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: 2.7.6
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y postgresql-13-postgis-3 libpq-dev
+
+    - name: Install gems
+      run: bundle install --jobs 4 --retry 3
+
+    - name: Setup database
+      env:
+        RAILS_ENV: test
+        DATABASE_URL: "postgres://rails_user:password@localhost:5432/test_db"
+      run: |
+        bundle exec rake db:setup
+        psql -U rails_user -d test_db -c "CREATE EXTENSION IF NOT EXISTS postgis;"
+
+    - name: Run tests
+      env:
+        RAILS_ENV: test
+      run: |
+        bundle exec rake db:migrate
+        bundle exec rspec

@@ -26,8 +26,12 @@ jobs:
       RAILS_ENV: test
       DATABASE_URL: "postgres://rails:password@localhost:5432/rails_test"
     steps:
+      - name: Install ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 2.7.6
       - name: Install dependencies
-        run:
+        run: |
           sudo apt-get update
           sudo apt-get install postgresql-13-postgis-3 libpq-dev
       - name: Checkout code

@@ -43,11 +43,11 @@ jobs:
 
     - name: Wait for PostgreSQL to be ready
       run: |
-        for i in {1..10}; do
-          pg_isready -U rails_user -h localhost && break
+        for i in {1..20}; do
+          pg_isready -U rails_user -h 127.0.0.1 -d oneclick_core_test && break
           echo "Waiting for PostgreSQL to be ready..."
-          sleep 5
-        done        
+          sleep 3
+        done
 
     - name: Install gems
       run: bundle install --jobs 4 --retry 3
@@ -55,9 +55,9 @@ jobs:
     - name: Setup database
       env:
         RAILS_ENV: test
-        DATABASE_URL: "postgres://rails_user:password@localhost:5432/oneclick_core_test"
+        DATABASE_URL: "postgres://rails_user:password@127.0.0.1:5432/oneclick_core_test"
       run: |
-        psql -U rails_user -d oneclick_core_test -c "CREATE EXTENSION IF NOT EXISTS postgis;"
+        psql -h 127.0.0.1 -U rails_user -d oneclick_core_test -c "CREATE EXTENSION IF NOT EXISTS postgis;"
         bundle exec rake db:create db:migrate db:seed
 
     - name: Run tests

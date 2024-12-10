@@ -57,7 +57,7 @@ jobs:
         RAILS_ENV: development
         DATABASE_URL: "postgres://root:password@localhost:5432/oneclick-core_development"
       run: |
-        bundle exec rake db:setup
+        bundle exec rake db:seed
         psql -U root -d oneclick-core_development -c "CREATE EXTENSION IF NOT EXISTS postgis;"
 
     - name: Run tests

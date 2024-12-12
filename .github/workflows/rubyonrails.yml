@@ -10,19 +10,6 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
-    services:
-      postgres:
-        image: postgres:13
-        env:
-          POSTGRES_USER: root
-          POSTGRES_PASSWORD: password
-          POSTGRES_DB: oneclick-core_test
-        options: >-
-          --health-cmd "pg_isready -U root -d oneclick-core_test"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
@@ -40,6 +27,19 @@ jobs:
         wget -qO - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
         sudo apt-get update
         sudo apt-get install -y postgresql-13-postgis-3 libpq-dev
+
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_USER: root
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: oneclick-core_test
+        options: >-
+          --health-cmd "pg_isready -U root -d oneclick-core_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     - name: Install gems
       run: bundle install --jobs 4 --retry 3

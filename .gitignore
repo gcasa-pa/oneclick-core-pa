@@ -35,8 +35,8 @@
 /config/oneclick_modules.rb
 
 # ruby version file
-.ruby-version
-.tool-versions
+#.ruby-version
+#.tool-versions
 
 # .idea file for RubyMine
 /.idea

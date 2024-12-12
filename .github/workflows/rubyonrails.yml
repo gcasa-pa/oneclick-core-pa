@@ -16,9 +16,9 @@ jobs:
         env:
           POSTGRES_USER: root
           POSTGRES_PASSWORD: password
-          POSTGRES_DB: oneclick-core_test
+          POSTGRES_DB: oneclick_core_test
         options: >-
-          --health-cmd "pg_isready -U root -d oneclick-core_test"
+          --health-cmd "pg_isready -U root -d oneclick_core_test"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
@@ -41,6 +41,13 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y postgresql-13-postgis-3 libpq-dev
 
+    - name: Wait for PostgreSQL to be ready
+      run: |
+        for i in {1..20}; do
+          pg_isready -h postgres -U root -d oneclick_core_test && break
+          echo "Waiting for PostgreSQL to be ready..."
+          sleep 3
+        done
 
     - name: Install gems
       run: bundle install --jobs 4 --retry 3
@@ -48,9 +55,9 @@ jobs:
     - name: Setup database
       env:
         RAILS_ENV: test
-        DATABASE_URL: "postgres://root:password@127.0.0.1:5432/oneclick-core_test"
+        DATABASE_URL: "postgres://root:password@postgres:5432/oneclick_core_test"
       run: |
-        psql -h 127.0.0.1 -U root -d oneclick-core_test -c "CREATE EXTENSION IF NOT EXISTS postgis;"
+        psql -h postgres -U root -d oneclick_core_test -c "CREATE EXTENSION IF NOT EXISTS postgis;"
         bundle exec rake db:create db:migrate db:seed
 
     - name: Run tests
@@ -58,3 +65,4 @@ jobs:
         RAILS_ENV: test
       run: |
         bundle exec rspec
+

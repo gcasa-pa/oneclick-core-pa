@@ -44,14 +44,6 @@ jobs:
     - name: Install gems
       run: bundle install --jobs 4 --retry 3
 
-    #- name: Wait for PostgreSQL to be ready
-    #  run: |
-    #    for i in {1..20}; do
-    #      pg_isready -U root -h 127.0.0.1 -d oneclick-core_test && break
-    #      echo "Waiting for PostgreSQL to be ready..."
-    #      sleep 3
-    #    done
-
     - name: Setup database
       env:
         RAILS_ENV: test

@@ -9,7 +9,7 @@ ENV POSTGRES_DB=oneclick_core_test
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Install system dependencies
-RUN apt-get update -qq &&     curl -sL https://deb.nodesource.com/setup_14.x | bash - &&     apt-get install -y         nodejs         postgresql-13         postgresql-13-postgis-3         libpq-dev         build-essential &&     rm -rf /var/lib/apt/lists/*
+RUN apt-get update -qq &&     curl -sL https://deb.nodesource.com/setup_14.x | bash - &&     apt-get install -y         nodejs         postgresql-13         postgresql-13-postgis-3         libpq-dev         libgeos-dev         build-essential &&     rm -rf /var/lib/apt/lists/*
 
 # Set the working directory
 WORKDIR /app

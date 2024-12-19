@@ -32,6 +32,7 @@ RUN apt-get update -qq && \
         postgresql-13 \
         postgresql-13-postgis-3 \
         libpq-dev \
+        libgeos-dev \
         build-essential && \
     rm -rf /var/lib/apt/lists/*
 
